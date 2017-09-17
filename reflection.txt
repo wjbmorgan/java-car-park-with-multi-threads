@@ -1,0 +1,13 @@
+instruction: execute the ¡°run.bat¡± to start simulation.
+
+This system of simulation is basically a buffer zone for produce & consume action. If there is no consumer, the producer is able to produce some cars to be parked in the parking sections. In the system, lift and sections work as monitors, while producer, consumer, operator, launch_vehicle, vehicle, return_vehicle work as threads. During the simulation, parameters are varied and default values seem to generate results as we expected.
+
+Still, there are some designing issues.
+
+1)In reality, if there is no consumer, or the consumer seldom consumes, the producer should continue producing until all the sections are full. However, in this system, if return_vehicle tows a car to the lift and move it to the ground floor with no consumer, the producer will wait for the car to be removed from the lift and stop producing, while there are still empty sections. One solution is that return_vehicle should check if the consumer is ready to consume before it tows the car to the lift.
+
+2)Given specified parameters, it is possible that this system has deadlock. It happens when the arrivalLapse() is small and TOWING_TIME is large. In this case, all the sections may be occupied while another car is lifted up to be towed. The whole system will be stuck. One solution is that producer should check if the first section is empty before ready to produce.
+
+3)When a car is to be towed, there are two ways. One is to remove it from its source immediately and after TOWING_TIME put it to its destination, the other is to remove and put at the same time after TOWING_TIME. In my opinion, the former is better. Since it takes time to tow, checking locks at both sides at the same time is not appropriate. Because the actions of get & put must be executed simultaneously with the lock checking. In other words, a temp zone is applied, which is also more similar to the reality. 
+
+4)To avoid the situation that the consumer takes the newly arrived car directly, one solution is to mark the car to specify if it¡¯s ready to be consumed.
